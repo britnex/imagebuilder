@@ -12,7 +12,6 @@ mydate=`date +%Y%m%d`
 
 ROOT_PASSWD="root"
 TIMEZONE="Europe/Berlin"
-KEYBOARD_CONFIGURATION="de"
 
 if [ $EUID -ne 0 ]; then
   echo "this tool must be run as root"
@@ -75,8 +74,6 @@ DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install git-core binutils 
 
 # Configure timezone
 ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
-# Configure keyboard
-sed -i 's/XKBLAYOUT=\"us\"/XKBLAYOUT=\"${KEYBOARD_CONFIGURATION}\"/g' /etc/default/keyboard
 # Set root password
 echo -e "${ROOT_PASSWD}\n${ROOT_PASSWD}" | passwd root
 rm -f third-stage
@@ -97,13 +94,13 @@ mkdir -p /rootfs-src
 cd /rootfs-src
 # ${Source} doesn't always show the source package name, ${source:Package} does.
 # Multiple packages can have the same source, sort -u eliminates duplicates.
-dpkg-query -f '${source:Package}\n' -W | sort -u | while read p; do
-    mkdir -p $p
-    pushd $p
+dpkg-query -f '\${source:Package}\n' -W | sort -u | while read p; do
+    mkdir -p \$p
+    pushd \$p
 
     # -qq very quiet, pushd provides cleaner progress.
     # -d download compressed sources only, do not extract.
-    apt-get -qq -d source $p
+    apt-get -qq -d source \$p
 
     popd
 done
